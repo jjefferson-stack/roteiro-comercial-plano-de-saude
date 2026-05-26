@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roteiro de Ligação — Josy Plano de Saúde</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1A7A4A;
+    --verde-claro: #E8F5EE;
+    --verde-medio: #2EA366;
+    --azul: #1B4F8A;
+    --azul-claro: #E8F0FA;
+    --laranja: #D4620A;
+    --laranja-claro: #FEF0E6;
+    --vermelho: #C13030;
+    --vermelho-claro: #FDEAEA;
+    --amarelo: #B8860B;
+    --amarelo-claro: #FDF6E3;
+    --cinza: #F4F5F7;
+    --cinza-medio: #E1E4EA;
+    --cinza-escuro: #6B7280;
+    --texto: #1A1D23;
+    --texto-secundario: #4B5563;
+    --branco: #FFFFFF;
+    --sombra: 0 2px 12px rgba(0,0,0,0.08);
+    --sombra-hover: 0 8px 24px rgba(0,0,0,0.12);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #F0F4F8;
+    color: var(--texto);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #0D3B26 0%, #1A7A4A 60%, #2EA366 100%);
+    padding: 28px 24px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50%;
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -20px; left: 30%;
+    width: 100px; height: 100px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+  }
+  .header-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.9);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 26px;
+    color: #FFFFFF;
+    line-height: 1.2;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .header p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    background: var(--branco);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--cinza-medio);
+  }
+  .progress-step {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cinza-escuro);
+    cursor: pointer;
+    transition: color .2s;
+    white-space: nowrap;
+  }
+  .progress-step.active { color: var(--verde); }
+  .progress-step.done { color: var(--verde-medio); }
+  .step-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--cinza-medio);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--cinza-escuro);
+    flex-shrink: 0;
+    transition: all .2s;
+  }
+  .progress-step.active .step-dot {
+    background: var(--verde);
+    color: white;
+    box-shadow: 0 0 0 3px rgba(26,122,74,0.2);
+  }
+  .progress-step.done .step-dot {
+    background: var(--verde-medio);
+    color: white;
+  }
+  .progress-line {
+    flex: 1;
+    height: 2px;
+    background: var(--cinza-medio);
+    border-radius: 1px;
+    min-width: 8px;
+    max-width: 24px;
+  }
+  .progress-line.done { background: var(--verde-medio); }
+
+  /* CONTENT */
+  .content {
+    padding: 16px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ETAPA */
+  .etapa {
+    display: none;
+    animation: fadeIn .3s ease;
+  }
+  .etapa.ativa { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* CARD */
+  .card {
+    background: var(--branco);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 12px;
+    box-shadow: var(--sombra);
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .etapa-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .etapa-icon {
+    width: 44px; height: 44px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .etapa-titulo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--texto);
+    margin: 0 0 3px;
+    line-height: 1.2;
+  }
+  .etapa-subtitulo {
+    font-size: 12px;
+    color: var(--cinza-escuro);
+    margin: 0;
+  }
+
+  /* FALA */
+  .fala {
+    background: var(--cinza);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border-left: 3px solid var(--verde);
+    position: relative;
+  }
+  .fala-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--verde);
+    margin-bottom: 6px;
+  }
+  .fala p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--texto);
+  }
+  .fala p em {
+    color: var(--cinza-escuro);
+    font-style: italic;
+    font-size: 13px;
+  }
+  .fala-copy {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none;
+    border: 1px solid var(--cinza-medio);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--cinza-escuro);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .fala-copy:hover {
+    background: var(--verde);
+    color: white;
+    border-color: var(--verde);
+  }
+  .fala-copy.copiado {
+    background: var(--verde);
+    color: white;
+    border-color: var(--verde);
+  }
+
+  /* DICA */
+  .dica {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .dica-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .dica-texto { color: var(--texto-secundario); }
+  .dica-texto strong { color: var(--texto); font-weight: 600; }
+  .dica.verde { background: var(--verde-claro); }
+  .dica.laranja { background: var(--laranja-claro); }
+  .dica.azul { background: var(--azul-claro); }
+  .dica.vermelho { background: var(--vermelho-claro); }
+  .dica.amarelo { background: var(--amarelo-claro); }
+
+  /* OBJEÇÃO */
+  .objecao-item {
+    border: 1px solid var(--cinza-medio);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .objecao-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    cursor: pointer;
+    background: var(--cinza);
+    transition: background .2s;
+    user-select: none;
+  }
+  .objecao-header:hover { background: #EAEDF2; }
+  .objecao-titulo {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--vermelho);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .objecao-chevron {
+    font-size: 12px;
+    color: var(--cinza-escuro);
+    transition: transform .2s;
+  }
+  .objecao-item.aberta .objecao-chevron { transform: rotate(180deg); }
+  .objecao-body {
+    display: none;
+    padding: 14px;
+    border-top: 1px solid var(--cinza-medio);
+  }
+  .objecao-item.aberta .objecao-body { display: block; }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--cinza);
+    font-size: 13px;
+    color: var(--texto-secundario);
+    cursor: pointer;
+    transition: color .2s;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li.checked { color: var(--verde); text-decoration: line-through; }
+  .check-box {
+    width: 18px; height: 18px;
+    border: 2px solid var(--cinza-medio);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+    margin-top: 1px;
+  }
+  .checklist li.checked .check-box {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: white;
+    font-size: 10px;
+  }
+
+  /* BOTÕES NAV */
+  .nav-botoes {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    margin-bottom: 24px;
+  }
+  .btn {
+    flex: 1;
+    padding: 13px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-prev {
+    background: var(--branco);
+    color: var(--texto-secundario);
+    border: 1px solid var(--cinza-medio);
+  }
+  .btn-prev:hover { background: var(--cinza); }
+  .btn-next {
+    background: var(--verde);
+    color: white;
+    box-shadow: 0 4px 12px rgba(26,122,74,0.3);
+  }
+  .btn-next:hover {
+    background: #156038;
+    box-shadow: 0 6px 16px rgba(26,122,74,0.4);
+  }
+  .btn-next:disabled {
+    background: var(--cinza-medio);
+    color: var(--cinza-escuro);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--cinza-escuro);
+    margin: 16px 0 8px;
+  }
+
+  /* TEMPO */
+  .tempo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: var(--amarelo-claro);
+    color: var(--amarelo);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
+  /* VARIANTES */
+  .variante-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .variante-tab {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid var(--cinza-medio);
+    color: var(--cinza-escuro);
+    background: var(--branco);
+    transition: all .2s;
+  }
+  .variante-tab.ativa {
+    background: var(--verde);
+    color: white;
+    border-color: var(--verde);
+  }
+  .variante-conteudo { display: none; }
+  .variante-conteudo.ativa { display: block; }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: var(--cinza-medio);
+    margin: 14px 0;
+  }
+
+  /* CONCLUIDO */
+  .concluido {
+    text-align: center;
+    padding: 32px 20px;
+  }
+  .concluido-icon {
+    font-size: 56px;
+    margin-bottom: 12px;
+  }
+  .concluido h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--verde);
+    margin-bottom: 8px;
+  }
+  .concluido p {
+    font-size: 14px;
+    color: var(--cinza-escuro);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">Josy Plano de Saúde</div>
+  <h1>Roteiro de Ligação</h1>
+  <p>Guia completo para conversão comercial · Planos Empresariais PJ</p>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-bar" id="progressBar">
+  <div class="progress-step active" onclick="irPara(0)" id="ps0">
+    <div class="step-dot">1</div>
+    <span>Abertura</span>
+  </div>
+  <div class="progress-line" id="pl0"></div>
+  <div class="progress-step" onclick="irPara(1)" id="ps1">
+    <div class="step-dot">2</div>
+    <span>Diagnóstico</span>
+  </div>
+  <div class="progress-line" id="pl1"></div>
+  <div class="progress-step" onclick="irPara(2)" id="ps2">
+    <div class="step-dot">3</div>
+    <span>Apresentação</span>
+  </div>
+  <div class="progress-line" id="pl2"></div>
+  <div class="progress-step" onclick="irPara(3)" id="ps3">
+    <div class="step-dot">4</div>
+    <span>Objeções</span>
+  </div>
+  <div class="progress-line" id="pl3"></div>
+  <div class="progress-step" onclick="irPara(4)" id="ps4">
+    <div class="step-dot">5</div>
+    <span>Fechamento</span>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- ETAPA 1: ABERTURA -->
+  <div class="etapa ativa" id="etapa0">
+    <div class="card">
+      <div class="etapa-header">
+        <div class="etapa-icon" style="background:#E8F5EE">📞</div>
+        <div>
+          <p class="etapa-titulo">Abertura da Ligação</p>
+          <p class="etapa-subtitulo">Primeiros 30 segundos — crie conexão e ganhe permissão</p>
+        </div>
+      </div>
+
+      <div class="tempo-badge">⏱ Duração: 30 a 60 segundos</div>
+
+      <p class="section-label">Script de abertura</p>
+
+      <div class="variante-tabs">
+        <div class="variante-tab ativa" onclick="trocarVariante('abertura', 0, this)">Lead novo</div>
+        <div class="variante-tab" onclick="trocarVariante('abertura', 1, this)">Lead frio</div>
+        <div class="variante-tab" onclick="trocarVariante('abertura', 2, this)">Não atendeu antes</div>
+      </div>
+
+      <div class="variante-conteudo abertura ativa">
+        <div class="fala">
+          <div class="fala-label">🎙 Fala</div>
+          <p>"Olá, [Nome]! Tudo bem? Aqui é a Josete, especialista em planos de saúde empresariais.<br><br>
+          Você preencheu um formulário hoje pedindo informações sobre plano para sua empresa — liguei para entender melhor o que você precisa e te mostrar as melhores opções. Tem uns minutinhos agora?"</p>
+          <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="variante-conteudo abertura">
+        <div class="fala">
+          <div class="fala-label">🎙 Fala</div>
+          <p>"Olá, [Nome]! Aqui é a Josete, corretora de planos de saúde.<br><br>
+          Há algumas semanas você demonstrou interesse em um plano empresarial — liguei porque temos uma condição especial esta semana para empresas com CNPJ. Consegue falar agora alguns minutinhos?"</p>
+          <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="variante-conteudo abertura">
+        <div class="fala">
+          <div class="fala-label">🎙 Fala</div>
+          <p>"Olá, [Nome]! Aqui é a Josete, corretora de planos de saúde — tentei te contatar alguns dias atrás.<br><br>
+          Quero te mostrar as opções de plano empresarial para o seu CNPJ, leva só alguns minutinhos. É um bom momento?"</p>
+          <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="section-label">Se ele disser que está ocupado</p>
+      <div class="fala">
+        <div class="fala-label">🎙 Resposta</div>
+        <p>"Sem problema! Quando fica melhor para eu te ligar — ainda hoje à tarde ou amanhã de manhã?"</p>
+        <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+      </div>
+
+      <div class="dica verde">
+        <span class="dica-icon">💡</span>
+        <span class="dica-texto"><strong>Dica:</strong> Sempre peça permissão antes de falar. "Tem uns minutinhos agora?" cria uma micro-confirmação que aumenta o engajamento da conversa.</span>
+      </div>
+
+      <div class="dica laranja">
+        <span class="dica-icon">⚠️</span>
+        <span class="dica-texto"><strong>Evite:</strong> Começar com "Estou ligando para oferecer..." — gera resistência imediata. Posicione como continuidade de um interesse que ele mesmo demonstrou.</span>
+      </div>
+    </div>
+
+    <div class="nav-botoes">
+      <button class="btn btn-next" onclick="irPara(1)">Próximo: Diagnóstico →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 2: DIAGNÓSTICO -->
+  <div class="etapa" id="etapa1">
+    <div class="card">
+      <div class="etapa-header">
+        <div class="etapa-icon" style="background:#E8F0FA">🔍</div>
+        <div>
+          <p class="etapa-titulo">Diagnóstico</p>
+          <p class="etapa-subtitulo">Entenda a situação antes de apresentar qualquer plano</p>
+        </div>
+      </div>
+
+      <div class="tempo-badge">⏱ Duração: 2 a 3 minutos</div>
+
+      <div class="dica azul">
+        <span class="dica-icon">💡</span>
+        <span class="dica-texto"><strong>Regra de ouro:</strong> Quem tem plano hoje está insatisfeito com algo. Quem não tem está com medo do preço. Descubra qual é o caso antes de falar de produto.</span>
+      </div>
+
+      <p class="section-label">Perguntas de diagnóstico — faça nessa ordem</p>
+
+      <div class="fala">
+        <div class="fala-label">❓ Pergunta 1 — Situação atual</div>
+        <p>"[Nome], você tem algum plano de saúde hoje — seja individual ou empresarial?"<br><br>
+        <em>→ Se tem: "O que está te fazendo pensar em mudar?"</em><br>
+        <em>→ Se não tem: "Há quanto tempo está sem plano?"</em></p>
+        <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+      </div>
+
+      <div class="fala">
+        <div class="fala-label">❓ Pergunta 2 — Perfil do plano</div>
+        <p>"Quantas pessoas vão usar o plano e quais as idades, aproximadamente?"<br><br>
+        <em>→ Anote: quantidade + faixas etárias → define o valor da proposta</em></p>
+        <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+      </div>
+
+      <div class="fala">
+        <div class="fala-label">❓ Pergunta 3 — Prioridade de cobertura</div>
+        <p>"Tem algum médico, clínica ou hospital específico que precisa estar na rede?"<br><br>
+        <em>→ Identifica se precisa de rede premium (Porto/Sulam.) ou rede ampla (Amil)</em></p>
+        <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+      </div>
+
+      <div class="fala">
+        <div class="fala-label">❓ Pergunta 4 — Expectativa de valor</div>
+        <p>"Tem alguma referência de valor que você esperava investir por pessoa, aproximadamente?"<br><br>
+        <em>→ Não tenha medo dessa pergunta — ela alinha expectativa antes da proposta e evita surpresa</em></p>
+        <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+      </div>
+
+      <div class="dica verde">
+        <span class="dica-icon">✅</span>
+        <span class="dica-texto"><strong>Antes de encerrar o diagnóstico:</strong> "Perfeito, [Nome]. Com essas informações já consigo montar a proposta certinha para você. Vou te enviar por WhatsApp ainda hoje — pode ser?"</span>
+      </div>
+    </div>
+
+    <div class="nav-botoes">
+      <button class="btn btn-prev" onclick="irPara(0)">← Voltar</button>
+      <button class="btn btn-next" onclick="irPara(2)">Próximo: Apresentação →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 3: APRESENTAÇÃO -->
+  <div class="etapa" id="etapa2">
+    <div class="card">
+      <div class="etapa-header">
+        <div class="etapa-icon" style="background:#FEF0E6">💼</div>
+        <div>
+          <p class="etapa-titulo">Apresentação da Proposta</p>
+          <p class="etapa-subtitulo">Eduque antes de apresentar o preço</p>
+        </div>
+      </div>
+
+      <div class="tempo-badge">⏱ Duração: 2 a 3 minutos</div>
+
+      <div class="dica laranja">
+        <span class="dica-icon">🎯</span>
+        <span class="dica-texto"><strong>Princípio chave:</strong> O lead está comparando preço porque ninguém mostrou valor primeiro. Explique o benefício do CNPJ antes de falar o número.</span>
+      </div>
+
+      <p class="section-label">Script de apresentação por operadora</p>
+
+      <div class="variante-tabs">
+        <div class="variante-tab ativa" onclick="trocarVariante('apres', 0, this)">Amil</div>
+        <div class="variante-tab" onclick="trocarVariante('apres', 1, this)">Porto Seguro</div>
+        <div class="variante-tab" onclick="trocarVariante('apres', 2, this)">Comparativo</div>
+      </div>
+
+      <div class="variante-conteudo apres ativa">
+        <div class="fala">
+          <div class="fala-label">🎙 Fala — Amil</div>
+          <p>"[Nome], com o seu CNPJ você acessa o plano empresarial Amil — que começa a partir de 2 vidas e tem rede em todo o estado de SP.<br><br>
+          A grande vantagem é que o preço por vida é bem menor do que o individual — a partir de R$ 200 por pessoa dependendo da faixa etária — e você ainda tem carência promocional agora.<br><br>
+          Vou te enviar a tabela completa no WhatsApp para você ver com calma. Mas já te adiantando: para [X pessoas nas idades que você me disse], o valor fica em torno de R$ [valor]. O que você acha?"</p>
+          <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="variante-conteudo apres">
+        <div class="fala">
+          <div class="fala-label">🎙 Fala — Porto Seguro</div>
+          <p>"[Nome], para empresas com 3 ou mais vidas, o Porto Saúde é uma das melhores opções do mercado — tem cobertura no Sírio-Libanês e rede premium em SP.<br><br>
+          É o plano que entrega a melhor cobertura para quem quer qualidade — e as condições para CNPJ são bem diferentes do individual.<br><br>
+          Vou te mandar a proposta no WhatsApp. Para o seu perfil, o valor fica em torno de R$ [valor] por vida. Quer que eu te explique o que está incluso?"</p>
+          <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="variante-conteudo apres">
+        <div class="fala">
+          <div class="fala-label">🎙 Fala — Comparativo</div>
+          <p>"[Nome], tenho duas opções que fazem sentido para o seu perfil e quero te mostrar as duas para você escolher o que melhor atende.<br><br>
+          A primeira é a Amil — rede ampla, a partir de 2 vidas, ótimo custo-benefício — a partir de R$ [valor] por vida.<br><br>
+          A segunda é o Porto Saúde — rede premium com Sírio-Libanês, a partir de 3 vidas — a partir de R$ [valor] por vida.<br><br>
+          Vou mandar as duas tabelas no WhatsApp agora para você comparar. Mas me fala: você prioriza mais o preço ou a cobertura?"</p>
+          <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="section-label">Checklist antes de encerrar a ligação</p>
+      <ul class="checklist" id="checklistApres">
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Apresentou os benefícios do CNPJ</li>
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Falou o preço estimado por vida</li>
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Mencionou carência promocional (Amil)</li>
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Confirmou envio da proposta no WhatsApp</li>
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Combinado data/hora para retorno</li>
+      </ul>
+    </div>
+
+    <div class="nav-botoes">
+      <button class="btn btn-prev" onclick="irPara(1)">← Voltar</button>
+      <button class="btn btn-next" onclick="irPara(3)">Próximo: Objeções →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 4: OBJEÇÕES -->
+  <div class="etapa" id="etapa3">
+    <div class="card">
+      <div class="etapa-header">
+        <div class="etapa-icon" style="background:#FDEAEA">🛡️</div>
+        <div>
+          <p class="etapa-titulo">Contorno de Objeções</p>
+          <p class="etapa-subtitulo">As 6 objeções mais comuns — e como responder</p>
+        </div>
+      </div>
+
+      <div class="dica vermelho">
+        <span class="dica-icon">💡</span>
+        <span class="dica-texto"><strong>Princípio:</strong> Nunca rebata uma objeção diretamente. Primeiro valide, depois recontextualize. "Entendo você — e justamente por isso..."</span>
+      </div>
+
+      <p class="section-label">Clique para ver a resposta</p>
+
+      <div class="objecao-item" onclick="toggleObjecao(this)">
+        <div class="objecao-header">
+          <div class="objecao-titulo">😬 "Tá caro, vi mais barato em outro lugar"</div>
+          <div class="objecao-chevron">▼</div>
+        </div>
+        <div class="objecao-body">
+          <div class="fala">
+            <div class="fala-label">🎙 Resposta</div>
+            <p>"Entendo, [Nome] — e é muito comum encontrar valores diferentes por aí. O que muda bastante é o que está incluso: cobertura hospitalar completa, rede credenciada, carência reduzida...<br><br>
+            Me fala: o que você viu mais barato incluía internação e cobertura hospitalar? Porque muitos planos mais baratos são só ambulatoriais — e na hora que você mais precisa, não cobre.<br><br>
+            Posso te mostrar o que está incluso no plano que te apresentei para você comparar com o que encontrou?"</p>
+            <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="objecao-item" onclick="toggleObjecao(this)">
+        <div class="objecao-header">
+          <div class="objecao-titulo">🤔 "Vou pensar e te retorno"</div>
+          <div class="objecao-chevron">▼</div>
+        </div>
+        <div class="objecao-body">
+          <div class="fala">
+            <div class="fala-label">🎙 Resposta</div>
+            <p>"Claro, sem problema! Só quero te avisar que a carência promocional que te mostrei tem prazo — geralmente as operadoras mudam as condições mensalmente.<br><br>
+            Me fala: o que você precisa pensar melhor? Se for sobre o valor ou a cobertura, posso te ajudar a esclarecer agora mesmo para facilitar sua decisão."</p>
+            <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="objecao-item" onclick="toggleObjecao(this)">
+        <div class="objecao-header">
+          <div class="objecao-titulo">💸 "Não tenho dinheiro agora"</div>
+          <div class="objecao-chevron">▼</div>
+        </div>
+        <div class="objecao-body">
+          <div class="fala">
+            <div class="fala-label">🎙 Resposta</div>
+            <p>"Entendo, [Nome]. Me deixa te mostrar uma coisa: o plano empresarial Amil começa a partir de R$ 200 por vida — para você e mais uma pessoa seria cerca de R$ 400 por mês.<br><br>
+            Muita gente não percebe, mas uma consulta particular hoje já custa R$ 250-350. Com o plano, você tem consultas, exames e internação cobertos por esse valor.<br><br>
+            Pensa assim: quando você ou alguém da família precisar de um médico sem plano, quanto vai custar? Às vezes o plano sai mais barato do que parece."</p>
+            <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="objecao-item" onclick="toggleObjecao(this)">
+        <div class="objecao-header">
+          <div class="objecao-titulo">📋 "Preciso ver com meu sócio / marido / esposa"</div>
+          <div class="objecao-chevron">▼</div>
+        </div>
+        <div class="objecao-body">
+          <div class="fala">
+            <div class="fala-label">🎙 Resposta</div>
+            <p>"Perfeito! Vou te mandar a proposta no WhatsApp com todos os detalhes para você mostrar para ele/ela com calma.<br><br>
+            Quando vocês conseguem conversar sobre isso — ainda hoje ou amanhã? Assim eu já agenda um horário para tirar qualquer dúvida que apareça na conversa de vocês."</p>
+            <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="objecao-item" onclick="toggleObjecao(this)">
+        <div class="objecao-header">
+          <div class="objecao-titulo">🏥 "Tenho medo da cobertura ser ruim"</div>
+          <div class="objecao-chevron">▼</div>
+        </div>
+        <div class="objecao-body">
+          <div class="fala">
+            <div class="fala-label">🎙 Resposta</div>
+            <p>"Essa é uma preocupação super válida — e é exatamente por isso que trabalho com Amil e Porto Seguro, que são as maiores e mais sólidas operadoras do Brasil.<br><br>
+            Me fala: tem algum médico ou hospital específico que você precisa que esteja coberto? Assim consigo verificar se está na rede antes de você decidir."</p>
+            <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="objecao-item" onclick="toggleObjecao(this)">
+        <div class="objecao-header">
+          <div class="objecao-titulo">📞 "Me manda por WhatsApp que eu vejo depois"</div>
+          <div class="objecao-chevron">▼</div>
+        </div>
+        <div class="objecao-body">
+          <div class="fala">
+            <div class="fala-label">🎙 Resposta</div>
+            <p>"Claro, vou mandar agora mesmo! Mas me deixa te fazer uma pergunta rápida antes: você tem alguma preferência de operadora ou quer que eu te mande as duas opções para comparar?<br><br>
+            Assim mando uma proposta personalizada para o seu caso — fica muito mais fácil de entender do que uma tabela genérica."</p>
+            <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-botoes">
+      <button class="btn btn-prev" onclick="irPara(2)">← Voltar</button>
+      <button class="btn btn-next" onclick="irPara(4)">Próximo: Fechamento →</button>
+    </div>
+  </div>
+
+  <!-- ETAPA 5: FECHAMENTO -->
+  <div class="etapa" id="etapa4">
+    <div class="card">
+      <div class="etapa-header">
+        <div class="etapa-icon" style="background:#E8F5EE">🏆</div>
+        <div>
+          <p class="etapa-titulo">Fechamento</p>
+          <p class="etapa-subtitulo">Conduza para a decisão — não espere ela acontecer</p>
+        </div>
+      </div>
+
+      <div class="tempo-badge">⏱ Duração: 1 a 2 minutos</div>
+
+      <div class="dica verde">
+        <span class="dica-icon">🎯</span>
+        <span class="dica-texto"><strong>Princípio:</strong> Nunca termine a ligação sem um próximo passo definido — seja uma data de retorno, envio de proposta ou confirmação de contratação.</span>
+      </div>
+
+      <p class="section-label">Scripts de fechamento</p>
+
+      <div class="variante-tabs">
+        <div class="variante-tab ativa" onclick="trocarVariante('fech', 0, this)">Lead decidido</div>
+        <div class="variante-tab" onclick="trocarVariante('fech', 1, this)">Lead indeciso</div>
+        <div class="variante-tab" onclick="trocarVariante('fech', 2, this)">Agendar retorno</div>
+      </div>
+
+      <div class="variante-conteudo fech ativa">
+        <div class="fala">
+          <div class="fala-label">🎙 Fala — Lead decidido</div>
+          <p>"Ótimo, [Nome]! Para iniciar o processo é bem simples — vou te enviar um formulário de proposta agora no WhatsApp com os dados que preciso.<br><br>
+          É só preencher e me devolver — eu cuido de todo o resto com a operadora. Em média leva de 3 a 5 dias para o plano ser ativado.<br><br>
+          Posso contar com você para preencher ainda hoje?"</p>
+          <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="variante-conteudo fech">
+        <div class="fala">
+          <div class="fala-label">🎙 Fala — Lead indeciso</div>
+          <p>"[Nome], entendo que é uma decisão importante. Me deixa te ajudar a simplificar: das opções que te mostrei, qual fez mais sentido para você — a Amil ou o Porto?<br><br>
+          Não precisa decidir agora, mas me fala o que você está comparando — assim eu te ajudo a chegar na melhor escolha sem você precisar pesquisar mais."</p>
+          <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="variante-conteudo fech">
+        <div class="fala">
+          <div class="fala-label">🎙 Fala — Agendar retorno</div>
+          <p>"Perfeito! Vou te mandar a proposta agora no WhatsApp.<br><br>
+          Posso te ligar amanhã às [horário] para tirar qualquer dúvida que aparecer? Assim a gente consegue agilizar para você já ter o plano ativo o quanto antes."</p>
+          <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="section-label">Encerramento da ligação — sempre use isso</p>
+      <div class="fala">
+        <div class="fala-label">🎙 Encerramento padrão</div>
+        <p>"[Nome], foi um prazer conversar com você! Vou mandar a proposta agora. Qualquer dúvida pode me chamar no WhatsApp a qualquer momento — estou à disposição. Até logo!"</p>
+        <button class="fala-copy" onclick="copiarTexto(this)">Copiar</button>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="section-label">Checklist final da ligação</p>
+      <ul class="checklist">
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Identificou situação atual do lead</li>
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Coletou quantidade de vidas e idades</li>
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Apresentou pelo menos uma operadora</li>
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Enviou proposta no WhatsApp</li>
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Definiu próximo passo com data e hora</li>
+        <li onclick="toggleCheck(this)"><div class="check-box"></div>Registrou o lead no CRM/planilha</li>
+      </ul>
+    </div>
+
+    <div class="card" style="background:#E8F5EE;border-color:#A8D5BE">
+      <div class="concluido">
+        <div class="concluido-icon">✅</div>
+        <h2>Roteiro concluído!</h2>
+        <p>Use este guia em todas as ligações.<br>Com consistência, a taxa de conversão melhora a cada semana.</p>
+      </div>
+    </div>
+
+    <div class="nav-botoes">
+      <button class="btn btn-prev" onclick="irPara(3)">← Voltar</button>
+      <button class="btn btn-next" onclick="irPara(0)">↺ Recomeçar</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let etapaAtual = 0;
+const totalEtapas = 5;
+
+function irPara(n) {
+  document.getElementById('etapa' + etapaAtual).classList.remove('ativa');
+  etapaAtual = n;
+  document.getElementById('etapa' + etapaAtual).classList.add('ativa');
+  atualizarProgress();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function atualizarProgress() {
+  for (let i = 0; i < totalEtapas; i++) {
+    const ps = document.getElementById('ps' + i);
+    const pl = document.getElementById('pl' + i);
+    ps.classList.remove('active', 'done');
+    if (pl) pl.classList.remove('done');
+    if (i < etapaAtual) {
+      ps.classList.add('done');
+      if (pl) pl.classList.add('done');
+    } else if (i === etapaAtual) {
+      ps.classList.add('active');
+    }
+  }
+}
+
+function trocarVariante(grupo, idx, el) {
+  const tabs = el.parentElement.querySelectorAll('.variante-tab');
+  tabs.forEach(t => t.classList.remove('ativa'));
+  el.classList.add('ativa');
+  const conteudos = el.closest('.card').querySelectorAll('.variante-conteudo.' + grupo);
+  conteudos.forEach((c, i) => {
+    c.classList.remove('ativa');
+    if (i === idx) c.classList.add('ativa');
+  });
+}
+
+function toggleObjecao(el) {
+  el.classList.toggle('aberta');
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+  if (el.classList.contains('checked')) {
+    el.querySelector('.check-box').innerHTML = '✓';
+  } else {
+    el.querySelector('.check-box').innerHTML = '';
+  }
+}
+
+function copiarTexto(btn) {
+  const fala = btn.closest('.fala');
+  const p = fala.querySelector('p');
+  const texto = p.innerText.replace(/→.*$/gm, '').trim();
+  navigator.clipboard.writeText(texto).then(() => {
+    btn.textContent = '✓ Copiado';
+    btn.classList.add('copiado');
+    setTimeout(() => {
+      btn.textContent = 'Copiar';
+      btn.classList.remove('copiado');
+    }, 2000);
+  });
+}
+</script>
+
+</body>
+</html>
